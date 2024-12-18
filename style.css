@@ -1,0 +1,362 @@
+html, body {
+    margin: 0;
+    background-color: rgba(0, 0, 0, .3);
+}
+
+nav {
+    width: 100%;
+    height: 130px;
+    color: rgba(0, 0, 0, .3);
+    display: grid;
+    grid-template-columns: 6fr 1fr;
+}
+
+nav .restoInfo {
+    display: grid;
+    grid-template-rows: 3fr 2fr;
+    align-items: center;
+}
+
+.restoInfo .nameRestaurant {
+    height: 100%;
+    width: 100%;
+    font-weight: bolder;
+    font-size: xx-large;
+    display: grid;
+    place-items: center;
+    color: black;
+}
+
+.restoInfo .navigation {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.navigation a {
+    margin: 0 3px;
+    width: 100%;
+    padding-bottom: 5px;
+    text-decoration: none;
+    color: rgba(0, 0, 0, .6);
+    display: grid;
+    place-items: center;
+    transition: .3s;
+}
+
+.navigation a:hover,
+.navigation .active {
+    color: black;
+    font-size: large;
+    font-weight: bolder;
+    border-bottom: 3px solid black;
+}
+
+nav img {
+    width: 100%;
+    height: 100px;
+    background-color: transparent;
+    display: grid;
+    place-items: center;
+}
+
+main {
+    padding: 20px;
+}
+
+main .historique, 
+main .description, 
+main .plats {
+    margin: 0 75px;
+    margin-bottom: 50px;
+    padding: 25px 10px;
+    display: grid;
+    grid-template-columns: 3fr 5fr;
+    grid-column-gap: 20px;
+    box-shadow: 1.5px 1.5px 1.5px 1.5px rgb(106, 104, 104);
+}
+
+main .invisible {
+    opacity: 0;
+}
+main:last-child {
+    margin-bottom: 0;
+}
+
+main .historique {
+    grid-template-columns: 5fr 3fr;
+}
+
+.historique h2, .description h2, .plats h2 {
+    margin: 0;
+    color: aliceblue;
+    background-color: antiquewhite;
+    display: grid;
+    place-items: center;
+    box-shadow: 1.5px 1.5px 1.5px 1.5px rgb(106, 104, 104);
+}
+
+.historique p, .description p, .plats p {
+    margin: 0;
+}
+
+.plats p:last-child {
+    margin-bottom: 20px;
+}
+
+footer {
+    background-color: rgba(0, 0, 0, .7);
+    display: grid;
+    grid-template-rows: 2fr 8fr;
+}
+
+footer .domaine {
+    color: aliceblue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.domaine .resto {
+    padding-left: 20px;
+    font-weight: bold;
+    font-size: x-large;
+}
+
+footer .foot {
+    margin: 15px 20px;
+    display: grid;
+    grid-template-columns: 5fr 5fr 10fr;
+}
+
+.foot .services, .foot .entreprises, .foot .social_medias {
+    display: flex;
+    flex-direction: column;
+}
+
+.services .entete, .entreprises .entete, .social_medias .entete {
+    height: 25%;
+    color: aliceblue;
+    font-size: large;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.services .serv, .entreprises .ent, .social_medias .smed {
+    height: 75%;
+    display: flex;
+    flex-direction: column;
+}
+
+.serv a, .ent a {
+    color: rgba(240, 248, 255, .5);
+    margin-bottom: 5px;
+    text-decoration: none;
+}
+
+.smed .text {
+    color: aliceblue;
+    margin-bottom: 10px;
+}
+
+.smed .social {
+    width: 50%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.smed a {
+    text-decoration: none;
+}
+
+a img {
+    height: 20px;
+    width: 20px;
+    color: rgba(240, 248, 255, .5);
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.infos {
+    padding: 20px 20px 0px 20px;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 3fr 7fr;
+}
+
+.infos .text {
+    padding: 150px 0;
+    display: grid;
+    place-items: center;
+}
+
+.infos iframe {
+    height: 80%;
+    border: none;
+}
+
+form {
+    display: grid;
+    place-items: center;
+    grid-template-rows: 1fr 1fr 1fr;
+}
+
+form .clientInfo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 50px;
+}
+
+.clientInfo input {
+    height: 25px;
+    border-radius: 5px;
+    background-color: rgb(240, 248, 255, .7);
+}
+
+form .msg {
+    height: 25px;
+    border-radius: 5px;
+    background-color: rgb(240, 248, 255, .7);
+}
+
+form .envoyer {
+    width: 100%;
+}
+
+.envoyez .pp {
+    width: 100%;
+    height: 30px;
+    background-color: rgb(0, 0, 255, .7);
+    border: none;
+    color: white;
+    border-radius: 5px;
+}
+
+main_menu {
+    margin: 25px;
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    column-gap: 20px;
+}
+
+aside {
+    display: flex;
+    flex-direction: column;
+}
+
+aside a {
+    display: grid;
+    place-items: center;
+    color: black;
+    text-decoration: none;
+    height: 50px;
+    margin-bottom: 5px;
+}
+
+aside a:hover,
+aside a.active {
+    font-weight: bold;
+    border: 2px solid black;
+}
+
+article {
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+    row-gap: 20px;
+}
+
+article section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 50px;
+}
+
+table {
+    margin-top: 2%;
+    display: grid;
+    align-items: center;
+    grid-template-rows: 1fr 4fr;
+}
+
+thead tr, tbody tr {
+    display: flex;
+    justify-content: space-between;
+}
+
+tr{
+    height: 30px;
+}
+
+.custom-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    max-width: 700px;
+    width: 100%;
+    background: transparent;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.form-row {
+    display: contents; /* Permet de gérer les enfants directement dans la grille */
+}
+
+input, button {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input:focus, button:focus {
+    outline: none;
+    border-color: #007BFF;
+}
+
+button {
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.span-2 {
+    grid-column: span 2;
+}
+
+@media screen and (max-width: 675px) {
+    footer .foot{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr auto;
+        grid-row-gap: 20px;
+    }
+
+    .services {
+        grid-column-start: 1;
+        grid-row-start: 1;
+    }
+
+    .entreprises {
+        grid-column-start: 2;
+        grid-row-start: 1;
+    }
+
+    .social_medias {
+        grid-column-start: 1;
+        grid-column-end: span 2;
+        grid-row-start: 2;
+    }
+}

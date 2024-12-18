@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Le menu du restaurant</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="style.css">
+        <style>
+            body {
+                margin: 0;
+                background-color: rgba(0, 0, 0, .3);
+            }
+
+            #carousel3 {
+                margin: 5%;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+
+            #carousel3 .item {
+                margin: 2%;
+                display: flex;
+                flex-direction: column;
+            }
+
+            #carousel3 .item:first-child {
+                margin-top: 0;
+            }
+
+            .item img {
+                width: 100%;
+                height: 450px;
+                display: block;
+            }
+
+            .item .item_body {
+                background-color: white;
+                padding: 20px 15px;
+                display: grid;
+                grid-template-rows: 1fr 2fr;
+                grid-row-gap: 10px;
+            }
+
+            .item_body .item_title {
+                font-size: larger;
+                font-weight: bold;
+            }
+
+            .carousel {
+                position: relative;
+            }
+
+            .carousel__container {
+                transition: transform .5s;
+                padding-bottom: 25px;
+            }
+
+            .carousel__container::after {
+                content: '';
+                clear: both;
+                display: table;
+            }
+
+            .carousel__item {
+                float: left;
+            }
+
+            .carousel__item:hover {
+                transform: scale(1.01);
+            }
+
+            .carousel__next, .carousel__prev {
+                position: absolute;
+                width: 40px;
+                height: 40px;
+                background-color: rgb(88, 87, 87);
+                border-radius: 50%;
+                top: 50%;
+                margin-top: -20px;
+                right: -20px;
+                cursor: pointer;
+                transition: .3s;
+            }
+
+            .carousel__prev {
+                right: auto;
+                left: -20px;
+            }
+
+            .carousel__next:hover,
+            .carousel__prev:hover {
+                transform: scale(1.1);
+            }
+
+            .carousel__next--hidden, 
+            .carousel__prev--hidden {
+                background-color: transparent;
+            }
+
+            .carousel__pagination {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+            }
+
+            .carousel__pagination__button {
+                background-color: gray;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                display: inline-block;
+                margin: 0 3px;
+                transition: .3s;
+                box-shadow: 0 2px 5px #32323221;
+                cursor: pointer;
+            }
+
+            .carousel__pagination__button--active, .carousel__pagination__button:hover {
+                transform: scale(1.4);
+            }
+        </style>
+        <script>
+            class Carousel {
+
+                constructor(element, options = {}) {
+                    this.element = element
+                    this.options = Object.assign({}, {
+                        slideToScroll: 1,
+                        slideVisible: 1,
+                        loop: false,
+                        pagination: false,
+                        navigation: true
+                    }, options)
+                    this.root = this.createDivWithClass('carousel')
+                    this.currentItem = 0
+                    this.isMobile = false
+                    this.moveCallbacks = []
+
+                    let children = [].slice.call(element.children)
+                    this.container = this.createDivWithClass('carousel__container')
+                    this.root.appendChild(this.container)
+                    this.root.setAttribute('tabindex', '0')
+                    this.element.appendChild(this.root)
+                    this.items = children.map((child) => {
+                        let item = this.createDivWithClass('carousel__item')
+                        item.appendChild(child)
+                        this.container.appendChild(item)
+                        return item
+                    })
+                    this.contenu = this.items.length
+                    this.setStyle()
+                    if (this.options.navigation === true) {
+                        this.createNavigation()
+                    }
+                    if (this.options.pagination === true) {
+                        this.createPagination()
+                    }
+                    this.moveCallbacks.forEach(cb => cb[0])
+                    this.onWindowResize()
+
+                    window.addEventListener('resize', this.onWindowResize.bind(this))
+                    this.root.addEventListener('keyup', e => {
+                        if (e.key === 'ArrowRight' || e.key === 'Right') {
+                            this.next()
+                        } else if (e.key === 'ArrowLeft' || e.key === 'Left') {
+                            this.prev()
+                        }
+                    })
+                }
+
+                setStyle() {
+                    let ratio = this.contenu / this.slideVisible
+                    this.container.style.width = '300%'
+                    this.items.forEach((item) => {
+                        item.style.width = ((100 / this.slideVisible) / ratio) + "%"
+                    })
+                }
+
+                createNavigation() {
+                    let nextButton = this.createDivWithClass('carousel__next')
+                    let prevButton = this.createDivWithClass('carousel__prev')
+                    this.root.appendChild(nextButton)
+                    this.root.appendChild(prevButton)
+                    nextButton.addEventListener('click', this.next.bind(this))
+                    prevButton.addEventListener('click', this.prev.bind(this))
+
+                    this.onMove(index => {
+                        if (index === 0) {
+                            prevButton.classList.add('carousel__prev--hidden')
+                        } else {
+                            prevButton.classList.remove('carousel__prev--hidden')
+                        }
+
+                        if (this.items[this.currentItem + this.slideVisible] === undefined) {
+                            nextButton.classList.add('carousel__next--hidden')
+                        } else {
+                            nextButton.classList.remove('carousel__next--hidden')
+                        }
+                    })
+                }
+
+                createPagination() {
+                    let pagination = this.createDivWithClass('carousel__pagination')
+                    let buttons = []
+                    this.root.appendChild(pagination)
+                    for (let i = 0; i < this.contenu; i = i + this.options.slideToScroll) {
+                        let button = this.createDivWithClass('carousel__pagination__button')
+                        button.addEventListener('click', () => this.gotoItem(i))
+                        pagination.appendChild(button)
+                        buttons.push(button)
+                    }
+                    this.onMove((index) => {
+                        let activeButton = buttons[Math.floor(index / this.options.slideToScroll)]
+                        if (activeButton) {
+                            buttons.forEach(button => button.classList.remove('carousel__pagination__button--active'))
+                            activeButton.classList.add('carousel__pagination__button--active')
+                        }
+                    })
+                }
+
+                next() {
+                    this.gotoItem(this.currentItem + this.slideToScroll)
+
+                }
+
+                prev() {
+                    this.gotoItem(this.currentItem - this.slideToScroll)
+                }
+
+                gotoItem(index) {
+                    if (index < 0) {
+                        index = this.contenu - this.slideVisible
+                    } else if (index >= this.contenu || (this.items[this.currentItem + this.slideVisible] === undefined && index > this.currentItem)) {
+                        index = 0
+                    }
+                    let translateX = -100 * index / this.contenu
+                    this.container.style.transform = 'translate3d(' + translateX + '%, 0, 0)'
+                    this.currentItem = index
+                    this.moveCallbacks.forEach(cb => cb[index])
+
+                    // Synchronize navigation buttons
+                    document.querySelectorAll('aside a').forEach((link, i) => {
+                        link.classList.toggle('active', i === index)
+                    })
+                }
+
+                onMove(cb) {
+                    this.moveCallbacks.push(cb)
+                }
+
+                onWindowResize() {
+                    let mobile = window.innerWidth < 800
+                    if (mobile !== this.isMobile) {
+                        this.isMobile = mobile
+                        this.setStyle()
+                        this.moveCallbacks.forEach(cb => cb[this.currentItem])
+                    }
+                }
+
+                createDivWithClass(className) {
+                    let div = document.createElement('div')
+                    div.setAttribute('class', className)
+                    return div
+                }
+
+                get slideToScroll() {
+                    return this.isMobile ? 1 : this.options.slideToScroll
+                }
+
+                get slideVisible() {
+                    return this.isMobile ? 1 : this.options.slideVisible
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const carousel = new Carousel(document.querySelector('#carousel3'))
+
+                // Synchronize buttons to scroll to the corresponding carousel item
+                document.querySelectorAll('aside a').forEach((link, index) => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault()
+                        carousel.gotoItem(index)
+                    })
+                })
+            })
+        </script>
+    </head>
+    <body>
+        <nav>
+            <div class="restoInfo">
+                <div class="nameRestaurant">Chill Restaurant</div>
+                <div class="navigation">
+                    <a href="index.html">Accueil</a>
+                    <a href="menu.html" class="active">Le menu</a>
+                    <a href="contact.html">Contactez-nous</a>
+                </div>
+            </div>
+            <img src="images/restaurant.svg">
+        </nav>
+
+        <main_menu>
+            <aside>
+                <a href="#entrees" class="active">ENTREES</a>
+                <a href="#plats">PLATS</a>
+                <a href="#desserts">DESSERTS</a>
+            </aside>
+            <div id="carousel3">
+                <div class="item" id="entrees">
+                    <div class="item_image">
+                        <img src="entrees.jpg" alt="">
+                    </div>
+                    <table class="entrees">
+                        <thead>
+                            <tr>
+                                <th>Entrees</th>
+                                <th>Prix</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Salade de saison</td>
+                                <td>120 Dh</td>
+                            </tr>
+                            <tr>
+                                <td>Cabecou en salade</td>
+                                <td>120 Dh</td>
+                            </tr>
+                            <tr>
+                                <td>foie gras de canard maison</td>
+                                <td>160 Dh</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="item" id="plats">
+                    <div class="item_image">
+                        <img src="plats.jpg" alt="">
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Plats</th>
+                                <th>Prix</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Merlu de ligne</td>
+                                <td>160 Dh</td>
+                            </tr>
+                            <tr>
+                                <td>Risotto de chipirons</td>
+                                <td>140 Dh</td>
+                            </tr>
+                            <tr>
+                                <td>Côte de boeuf</td>
+                                <td>490 Dh</td>
+                            </tr>
+                            <tr>
+                                <td>Entrecôte de boeuf</td>
+                                <td>220 Dh</td>
+                            </tr>
+                            <tr>
+                                <td>Faux filet de boeuf grillé</td>
+                                <td>140 Dh</td>
+                            </tr>
+                            <tr>
+                                <td>Burger du "Capitaine"</td>
+                                <td>140 Dh</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="item" id="desserts">
+                    <div class="item_image">
+                        <img src="glaces.jpg" alt="">
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Desserts</th>
+                                <th>Prix</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Planches de brebis</td>
+                                <td>100 Dh</td>
+                            </tr>
+                            <tr>
+                                <td>Fondant au chocolat</td>
+                                <td>50 Dh</td>
+                            </tr>
+                            <tr>
+                                <td>Fraise melba</td>
+                                <td>60 Dh</td>
+                            </tr>
+                            <tr>
+                                <td>Café gourmand</td>
+                                <td>80 Dh</td>
+                            </tr>
+                            <tr>
+                                <td>glaces 2 boules</td>
+                                <td>40 Dh</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main_menu>
+
+        <footer>
+            <div class="domaine">
+                <div class="logo">Logo</div>
+                <div class="resto">Chill restaurant</div>
+            </div>
+            <div class="foot">
+                <div class="services">
+                    <div class="entete">Services</div>
+                    <div class="serv">
+                        <a href="#">Mariage</a>
+                        <a href="#">restauration</a>
+                        <a href="#">Organisation des fetes</a>
+                    </div>
+                </div>
+                <div class="entreprises">
+                    <div class="entete">Entreprises</div>
+                    <div class="ent">
+                        <a href="#">Rabat</a>
+                        <a href="#">Casablanca</a>
+                        <a href="#">Tanger</a>
+                    </div>
+                </div>
+                <div class="social_medias">
+                    <div class="entete">Social</div>
+                    <div class="smed">
+                        <div class="text">
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo ab voluptatibus corporis amet illum exercitationem
+                            sint error reiciendis? Nulla voluptates consectetur nemo quia quae magni natus facilis necessitatibus corporis
+                            atque.
+                        </div>
+                        <div class="social">
+                            <a href="#"><img src="images/telegram.svg"></a>
+                            <a href="#"><img src="images/twitter.svg"></a>
+                            <a href="#"><img src="images/instagram.svg"></a>
+                            <a href="#"><img src="images/linkedin.svg"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright" style="display: grid;place-items: center;">
+                &copy; 2024 Chill Restaurant. Tous droits réservés.
+            </div>
+        </footer>
+    </body>
+</html>
